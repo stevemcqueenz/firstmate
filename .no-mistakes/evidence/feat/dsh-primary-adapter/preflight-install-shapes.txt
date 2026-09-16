@@ -1,0 +1,41 @@
+# Round 2 at ba844b4: the preflight now FAILS when it cannot read dsh-base, so every supported install shape must still resolve it
+
+## (A) global npm install shape: <prefix>/bin/dsh -> ../lib/node_modules/@deepseek-ai/dsh/lib/bin.js, dsh-base NESTED under the dsh package
+$ npm install -g --prefix <tmp>/gprefix @deepseek-ai/dsh@0.1.5-rc.1
+$ ls -l $(command -v dsh)
+<tmp>/gprefix/bin/dsh -> ../lib/node_modules/@deepseek-ai/dsh/lib/bin.js
+$ find <tmp>/gprefix -path "*dsh-base/package.json"
+<tmp>/gprefix/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-base/package.json
+$ DSH_HOME=<fresh> dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2; ls $DSH_HOME/profiles
+web
+$ cd /tmp && <checkout>/bin/fm-dsh-launch.sh web --patch <checkout>/.dsh/profile.patch.yml --port 3943 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+[launcher still running as pid 19618, port 3943 listening]
+$ ps -o comm,args -p 19618
+COMM ARGS
+node node <tmp>/gprefix/bin/dsh web --patch <checkout>/.dsh/profile.patch.yml --port 3943 --no-open
+
+## (B) the same global dsh, against a home whose bridge is the stale npm-latest build
+FAIL  hooks bridge 0.0.1-rc.5 does not match dsh-base 0.1.5-rc.2
+      a mismatched bridge throws before any hook matches and makes every tool call fail; reinstall: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+
+## (C) dsh not on PATH at all (the new hard-fail branch)
+$ PATH=<node, jq, lsof only> <checkout>/bin/fm-dsh-preflight.sh --profile web --home <checkout> --patch <checkout>/.dsh/profile.patch.yml
+FAIL  could not read the running dsh-base version from the dsh installation (dsh is not on PATH)
+      put the dsh CLI on PATH: without dsh-base's version the hooks bridge pin cannot be checked, and a mismatched bridge makes every tool call fail
+FAIL  could not read the composed configuration: dsh --profile web --dump-config failed
+      run that command to see why; neither the instruction budget nor the permission preset new sessions default to can be checked without it
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 2 required check(s) failed, 0 warning(s)
+[exit 3]

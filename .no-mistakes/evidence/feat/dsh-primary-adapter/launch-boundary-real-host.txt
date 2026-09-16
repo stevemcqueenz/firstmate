@@ -1,0 +1,26 @@
+$ cd /tmp && CLAUDECODE=1 GROK_AGENT=x DSH_HOME=<disposable> bin/fm-dsh-launch.sh web --patch <checkout>/.dsh/profile.patch.yml --port 3917 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+dsh web: http://127.0.0.1:3917/?token=<redacted>
+
+$ ps -o pid,comm,args -p 36793
+  PID COMM ARGS
+36793 node node /Users/stevemcqueen/.npm/_npx/1e7f6d9597241db0/node_modules/.bin/dsh web --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml --port 3917 --no-open
+
+$ ps -Eww -o command= -p 36793 | tr ' ' '
+' | grep -E '^(FM_*|LC_ALL|LC_CTYPE|CLAUDECODE|GROK_AGENT)='
+FM_ROOT=/Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS
+FM_HOME=/Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS
+LC_CTYPE=en_US.UTF-8
+FM_DSH_HARNESS=dsh
+LC_ALL=en_US.UTF-8
+(CLAUDECODE and GROK_AGENT absent from the host environment although the launching shell exported them)
+
+$ lsof -a -p 36793 -d cwd -Fn
+n/Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS

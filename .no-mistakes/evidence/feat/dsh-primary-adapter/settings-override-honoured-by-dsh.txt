@@ -1,0 +1,26 @@
+# (n) settings.yaml overrides the patch: preflight refuses, and FM_DSH_SKIP_PREFLIGHT=1 boots anyway to show what DSH actually seeds
+$ cat $DSH_HOME/settings.yaml
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1
+permission:
+  defaultPreset: workspace-write
+agent-presets:
+  default: standard
+
+$ bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3920 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (/tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset 'workspace-write' (/tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml), not danger-full-access
+      set the permission entry's defaultPreset to danger-full-access in /tmp/fm-dsh-test.EZa9Vo/dsh-home/profiles/web/cordis.patch.yml and clear any permission defaultPreset in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 2 required check(s) failed, 0 warning(s)
+[launcher exit 3]
+
+$ FM_DSH_SKIP_PREFLIGHT=1 bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3920 --no-open
+# DSH web UI under the overridden settings
+dsh web UI: composer seat shows "Standard mode" (ticked default), Settings > General > Permission shows "Workspace Write".
+Screenshots: dsh-web-override-preset-picker-standard.png, dsh-web-override-settings-workspace-write.png

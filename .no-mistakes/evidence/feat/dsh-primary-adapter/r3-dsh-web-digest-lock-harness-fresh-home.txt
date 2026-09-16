@@ -1,0 +1,68 @@
+# Round 3 at 5e09857: documented web launch driven through a REAL DSH host (dsh 0.1.5-rc.1 / dsh-base 0.1.5-rc.2)
+# Disposable firstmate home = git clone of 5e09857 at <tmp>/fmhome with NO state/ directory (fresh checkout); disposable DSH_HOME;
+# bridge pinned: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2; no model credential, so each turn ends
+# MISSING_CREDENTIAL after UserPromptSubmit ran and the request was composed and persisted in the session log.
+
+## 1. launch (operator env has no DSH_PERMISSION_MODE): env -u DSH_PERMISSION_MODE <fmhome>/bin/fm-dsh-launch.sh web --patch <fmhome>/.dsh/profile.patch.yml --port 3957 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+dsh web: http://127.0.0.1:3957/?token=<redacted>
+state/ before the first prompt: absent (ls right after the host came up: "No such file or directory")
+host process: 33815 node  env: DSH_PERMISSION_MODE=danger-full-access FM_DSH_HARNESS=dsh 
+
+## 2. two prompts sent from the web UI (Playwright/Brave) into ONE new session on workspace fmhome, preset Firstmate, access mode 'Full access'
+session log events (permission, sandbox, hooks):
+{"seq":0,"type":"permission/preset","data":{"preset":"danger-full-access"}}
+{"seq":1,"type":"sandbox/mode","data":{"mode":"danger-full-access"}}
+{"seq":7,"type":"hook/result","data":{"turn":1,"point":"UserPromptSubmit","handlerId":"claude-code:UserPromptSubmit:1","decision":"pass","exitCode":0,"durationMs":7029.593832999992}}
+{"seq":26,"type":"hook/result","data":{"turn":2,"point":"UserPromptSubmit","handlerId":"claude-code:UserPromptSubmit:2","decision":"pass","exitCode":0,"durationMs":73.66250000000582}}
+hooks-claude-code context messages in the session log (source.plugin == hooks-claude-code):
+{"seq":14,"bytes":8631}
+  -> exactly one, on turn 1 (seq 14); turn 2's UserPromptSubmit returned in 74 ms with no injection (once-per-session gate held)
+state/.dsh-sessionstart-delivered after both prompts: session-4c5b8cea-246c-495a-bcfa-5c329c50f6b7
+state/.lock: 33815  (== DSH host pid above)
+AGENTS.md workspace-instructions message (seq 11): 82555 bytes; 'omitted' markers: 0
+
+## 3. the delivered digest (seq 14), head:
+
+================================================================================
+SESSION START - <tmp>/fmhome
+================================================================================
+
+LOCK
+--------------------------------------------------------------------------------
+lock acquired: harness pid 33815
+
+BOOTSTRAP
+--------------------------------------------------------------------------------
+(silent - all good)
+
+WAKE QUEUE
+--------------------------------------------------------------------------------
+(no queued wakes)
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: dsh
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- X mode: inactive; use the default watcher cadence.
+- Ordinary wake: follow the continuation in the harness protocol below; do not use shell &.
+
+Mode: DSH background-job wake.
+
+When this session owns supervision and away mode is not active:
+1. Drain first with `bin/fm-wake-drain.sh`.
+   After handling all emitted wakes and reconciling open decisions and unread status lines, run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`; until then the work remains durable for idempotent re-handling after interruption.
+...
+146:Follow the supervision operating instructions block above for harness 'dsh'.
+
+compare round 2 (ba844b4): 'error: cannot locate harness process in ancestry' / READ-ONLY SESSION / primary harness: unknown / Unknown harness fallback, and no digest at all without state/
+screenshots: r3-dsh-web-digest-lock-acquired-harness-dsh.png, r3-dsh-web-digest-primary-harness-dsh.png

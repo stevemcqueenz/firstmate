@@ -1,0 +1,18 @@
+# (m) a stale hooks bridge (npm dist-tag latest = 0.0.1-rc.5) against dsh-base 0.1.5-rc.2
+$ npm view @deepseek-ai/dsh-hooks-claude-code dist-tags
+{ latest: '0.0.1-rc.5', alpha: '0.1.6-alpha.1', next: '0.1.5-rc.2' }
+$ dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@latest
+
+$ bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3919 --no-open
+[launcher exit 3]
+FAIL  hooks bridge 0.0.1-rc.5 does not match dsh-base 0.1.5-rc.2
+      a mismatched bridge throws before any hook matches and makes every tool call fail; reinstall: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+$ lsof -nP -iTCP:3919 -sTCP:LISTEN
+(nothing listening: dsh was never exec'd)

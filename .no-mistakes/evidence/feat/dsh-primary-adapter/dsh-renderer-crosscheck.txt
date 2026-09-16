@@ -1,0 +1,8 @@
+# DSH's own preset discovery and instruction renderer (@deepseek-ai/dsh-agent-presets, dsh-agent-instructions 0.1.5-rc.2)
+## harness home without its own AGENTS.md (the normal case)
+DSH discoverPresets firstmate: found, healthy, name="Firstmate"
+maxBytes 262144: omitted=[] truncated=[] renderedBytes=82554
+maxBytes 65536: omitted=["AGENTS.md"] truncated=[] renderedBytes=455
+## harness home with a 200 KB AGENTS.md (preflight case l): DSH omits the broadest file, the harness-home one; the preflight's over-budget FAIL agrees that something is omitted
+DSH discoverPresets firstmate: found, healthy, name="Firstmate"
+maxBytes 262144: omitted=["$DSH_HOME/AGENTS.md"] truncated=[] renderedBytes=82626

@@ -1,0 +1,36 @@
+# fresh DSH_HOME, stale bridge installed the documented-pitfall way, then the first launch
+$ dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@latest
+  "version": "0.0.1-rc.5",
+$ ls $DSH_HOME/profiles
+web
+
+$ bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3922 --no-open   # first launch
+WARN  could not read the running dsh-base version
+      checked /tmp/fm-dsh-test.EZa9Vo/fresh-home2/profiles/web/node_modules/@deepseek-ai/dsh-base/package.json
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 1 warning(s)
+$ lsof -nP -iTCP:3922 -sTCP:LISTEN
+COMMAND   PID         USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    11859 stevemcqueen   14u  IPv4 0xb626dbb1600dc954      0t0  TCP 127.0.0.1:3922 (LISTEN)
+=> the launcher exec'd dsh with bridge 0.0.1-rc.5 against dsh-base 0.1.5-rc.2
+
+$ ls $DSH_HOME/profiles   # dsh has now created the shared module dir
+node_modules
+web
+
+$ bin/fm-dsh-preflight.sh --profile web --home . --patch .dsh/profile.patch.yml   # second launch
+FAIL  hooks bridge 0.0.1-rc.5 does not match dsh-base 0.1.5-rc.2
+      a mismatched bridge throws before any hook matches and makes every tool call fail; reinstall: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]

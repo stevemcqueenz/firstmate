@@ -1,0 +1,66 @@
+# Round 3 at 5e09857: the new hook-sandbox preflight check can fail, and the launcher's override holds (real dsh 0.1.5-rc.1 / dsh-base 0.1.5-rc.2)
+# Disposable firstmate clone + disposable DSH_HOME with the pinned 0.1.5-rc.2 bridge; composed sandbox-policy row:
+#   mode: !!js process.env.DSH_PERMISSION_MODE ?? 'workspace-write'
+
+## A1. preflight run standalone (not via the launcher), DSH_PERMISSION_MODE unset
+$ env -u DSH_PERMISSION_MODE bin/fm-dsh-preflight.sh --profile web --home <fmhome> --patch .dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+FAIL  hooks run under sandbox mode 'workspace-write', not danger-full-access
+      launch through bin/fm-dsh-launch.sh, which exports DSH_PERMISSION_MODE=danger-full-access, and leave sandbox-policy's mode to that variable: the hooks bridge runs hooks with no session, so ps is denied in every hook and the digest reads READ-ONLY with an unknown harness
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3
+
+## A2. launcher with an operator patch that pins sandbox-policy mode: workspace-write (literal)
+$ bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --patch pin-workspace-write.patch.yml --port 3958 --no-open
+  | - id: sandbox-policy
+  |   config:
+  |     mode: workspace-write
+  |     workspaceRoot: !!js process.cwd()
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+FAIL  hooks run under sandbox mode 'workspace-write', not danger-full-access
+      launch through bin/fm-dsh-launch.sh, which exports DSH_PERMISSION_MODE=danger-full-access, and leave sandbox-policy's mode to that variable: the hooks bridge runs hooks with no session, so ps is denied in every hook and the digest reads READ-ONLY with an unknown harness
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3
+no dsh host on 3958 after 25 s (launcher refused before exec)
+
+## A3. operator shell exports DSH_PERMISSION_MODE=workspace-write; launcher overrides it
+$ DSH_PERMISSION_MODE=workspace-write bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3959 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+dsh web: http://127.0.0.1:3959/?token=<redacted>
+running host's environment: DSH_PERMISSION_MODE=danger-full-access
+
+## R1. regression: first launch of a FRESH DSH home with the stale npm-latest bridge (no profiles/node_modules yet)
+$ dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@latest   # installs 0.0.1-rc.5
+$ bin/fm-dsh-launch.sh web --patch .dsh/profile.patch.yml --port 3960 --no-open
+FAIL  hooks bridge 0.0.1-rc.5 does not match dsh-base 0.1.5-rc.2
+      a mismatched bridge throws before any hook matches and makes every tool call fail; reinstall: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3
+no dsh host on 3960 (launcher refused before exec)

@@ -1,0 +1,56 @@
+# (a) documented web launch WITHOUT the tracked patch: host agent-instructions row is disabled, sessions use DSH's standard preset
+
+$ bin/fm-dsh-preflight.sh --profile web --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (profile web), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset '<inferred from the sandbox knobs>' (profile web), not danger-full-access
+      set the permission entry's defaultPreset to danger-full-access in /tmp/fm-dsh-test.EZa9Vo/dsh-home/profiles/web/cordis.patch.yml and clear any permission defaultPreset in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 2 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (d) settings.yaml permission.defaultPreset: workspace-write outranks the patch's danger-full-access
+
+$ bin/fm-dsh-preflight.sh --profile web --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+FAIL  new sessions default to permission preset 'workspace-write' (/tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml), not danger-full-access
+      set the permission entry's defaultPreset to danger-full-access in /tmp/fm-dsh-test.EZa9Vo/dsh-home/profiles/web/cordis.patch.yml and clear any permission defaultPreset in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (e) settings.yaml agent-presets.default: standard outranks the patch's firstmate default
+
+$ bin/fm-dsh-preflight.sh --profile web --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (/tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in /tmp/fm-dsh-test.EZa9Vo/dsh-home/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (f) an extra overlay gates the agent-presets row with a !!js expression
+
+$ bin/fm-dsh-preflight.sh --profile web --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml --patch /tmp/fm-dsh-test.EZa9Vo/js-gate.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  profile web's agent-presets row is not provably enabled or disabled
+      make its disabled field a literal boolean, so the composition sessions render with can be checked
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]

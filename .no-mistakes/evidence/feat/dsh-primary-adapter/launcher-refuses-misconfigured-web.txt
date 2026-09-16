@@ -1,0 +1,54 @@
+# Round 2 at ba844b4: launcher refusals on a home whose bridge is correctly pinned (so only the intended check fails)
+
+## (a) the documented web launch WITHOUT the tracked patch: sessions would compose from DSH's standard preset at 65536 under workspace-write
+$ <checkout>/bin/fm-dsh-launch.sh web --port 3944 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (profile web), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in <tmp>/fresh-pinned/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset '<inferred from the sandbox knobs>' (profile web), not danger-full-access
+      set the permission entry's defaultPreset to danger-full-access in <tmp>/fresh-pinned/profiles/web/cordis.patch.yml and clear any permission defaultPreset in <tmp>/fresh-pinned/settings.yaml: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 2 required check(s) failed, 0 warning(s)
+[launcher exit 3]
+(nothing listening on 3944)
+
+## (b) the tracked patch, but the settings page's own choices in $DSH_HOME/settings.yaml outrank it
+$ cat $DSH_HOME/settings.yaml
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1
+permission:
+  defaultPreset: workspace-write
+agent-presets:
+  default: standard
+$ <checkout>/bin/fm-dsh-launch.sh web --patch <checkout>/.dsh/profile.patch.yml --port 3945 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (<tmp>/override-home/settings.yaml), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in <tmp>/override-home/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset 'workspace-write' (<tmp>/override-home/settings.yaml), not danger-full-access
+      set the permission entry's defaultPreset to danger-full-access in <tmp>/override-home/profiles/web/cordis.patch.yml and clear any permission defaultPreset in <tmp>/override-home/settings.yaml: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 2 required check(s) failed, 0 warning(s)
+[launcher exit 3]
+(nothing listening on 3945)
+
+## (c) a DSH re-sync of the firstmate preset that dropped the raise (maxBytes back to standard's 65536)
+$ grep -n maxBytes <copy>/.dsh/agent-presets/firstmate/agent.cordis.yml
+13:# every DSH upgrade, re-copy that file and re-apply the maxBytes raise above;
+52:    maxBytes: 65536
+$ FM_ROOT=<copy> fm-dsh-preflight.sh --profile web --home <copy> --patch <copy>/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  the rendered instruction chain is about 83242 bytes but the firstmate agent preset's maxBytes is 65536
+      raise the agent-instructions entry's maxBytes in <tmp>/home-65536/.dsh/agent-presets/firstmate/agent.cordis.yml, and on every DSH home: over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]

@@ -1,0 +1,10 @@
+# tests/fm-dsh-harness.test.sh at 69d1d79, run from this no-mistakes LINKED worktree (git-dir != git-common-dir)
+not ok - subagent must be denied by the delegation guard, got rc=0
+(suite aborts at the first failure)
+
+# same unmodified suite, run from a plain (non-worktree) git copy of 69d1d79
+ok - dsh tracked hooks: wrappers dispatch, self-verify, and fail safe
+41 ok, 0 not ok
+
+# after scoping the two guard assertions to a primary-shaped fixture (make_guard_home), run from the linked worktree
+41 ok, 0 not ok

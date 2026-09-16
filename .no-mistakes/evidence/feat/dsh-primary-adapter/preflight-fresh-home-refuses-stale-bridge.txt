@@ -1,0 +1,25 @@
+# Round 2 at ba844b4 (fix for round-1 finding dsh-preflight-fresh-home-skips-bridge-check)
+# fresh DSH_HOME, stale bridge installed the documented-pitfall way (npm latest), then the FIRST launch through the launcher
+$ dsh --version
+0.1.5-rc.1
+$ dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@latest
+$ grep version $DSH_HOME/profiles/web/node_modules/@deepseek-ai/dsh-hooks-claude-code/package.json
+  "version": "0.0.1-rc.5",
+$ ls $DSH_HOME/profiles    # no shared profiles/node_modules mirror: this is the first launch
+web
+
+$ cd /tmp && <checkout>/bin/fm-dsh-launch.sh web --patch <checkout>/.dsh/profile.patch.yml --port 3941 --no-open
+FAIL  hooks bridge 0.0.1-rc.5 does not match dsh-base 0.1.5-rc.2
+      a mismatched bridge throws before any hook matches and makes every tool call fail; reinstall: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[launcher exit 3]
+$ lsof -nP -iTCP:3941 -sTCP:LISTEN
+(nothing listening: dsh was never exec'd)
+$ ls $DSH_HOME/profiles
+web

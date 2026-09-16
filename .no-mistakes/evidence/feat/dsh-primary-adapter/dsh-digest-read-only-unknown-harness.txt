@@ -1,0 +1,97 @@
+# Round 2 at ba844b4: the tracked UserPromptSubmit digest, driven through a REAL DSH host (dsh 0.1.5-rc.1 / dsh-base 0.1.5-rc.2)
+# Disposable firstmate home = a git clone of ba844b4 at <tmp>/fmhome; disposable DSH_HOME; no model credential, so every turn
+# ends MISSING_CREDENTIAL AFTER UserPromptSubmit has run and the request has been composed and persisted in the DSH session log.
+
+## 1. headless launch through the launcher: <fmhome>/bin/fm-dsh-launch.sh --profile fmh --patch <fmhome>/.dsh/profile.patch.yml 'Reply with the word PING.'
+##    (fmh = a profile made --from-default-profile headless, bridge pinned 0.1.5-rc.2; preflight: all required checks passed)
+### 1a. fresh clone, no state/ directory (a brand-new home)
+hook/result UserPromptSubmit decision=pass exitCode=0; request carried AGENTS.md (82554 bytes, nothing omitted) but NO hooks-claude-code context message
+state/ after the run: absent  -> bin/fm-dsh-sessionstart.sh exits 0 at '[ -d "$STATE" ] || exit 0' before fm-session-start.sh (whose fm-lock.sh would create state/) can run, so a new home never gets a digest
+
+### 1b. same home with state/ created: the digest is delivered (6774 bytes, hooks-claude-code message before request/header), and it says:
+
+================================================================================
+SESSION START - <tmp>/fmhome
+================================================================================
+
+LOCK
+--------------------------------------------------------------------------------
+error: cannot locate harness process in ancestry
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  READ-ONLY SESSION - FLEET LOCK OWNERSHIP WAS NOT VERIFIED
+●  error: cannot locate harness process in ancestry
+●  Skipping every mutating step: stale Herdr child cleanup,
+●  secondmate convergence, secondmate liveness, pending remote handoff retry,
+●  X-mode artifacts, fleet sync, and wake-queue drain. Detect-only bootstrap
+●  diagnostics and the rest of this read-only-safe digest still ran below.
+●  Operate read-only until this resolves - do not spawn, steer, merge, or
+●  otherwise mutate fleet state from this session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BOOTSTRAP
+28:SUPERVISION OPERATING INSTRUCTIONS - primary harness: unknown
+36:Mode: Unknown harness fallback.
+session log: permission/preset=danger-full-access, sandbox/mode=danger-full-access (the preflight's check 3 passed)
+
+## 2. the documented web launch: <fmhome>/bin/fm-dsh-launch.sh web --patch <fmhome>/.dsh/profile.patch.yml --port 3946 --no-open (all preflight checks ok)
+##    prompt 'Reply with the word PONG.' sent from the web UI into a danger-full-access session; the web host ran the hook. Digest delivered (session log seq 31):
+
+================================================================================
+SESSION START - <tmp>/fmhome
+================================================================================
+
+LOCK
+--------------------------------------------------------------------------------
+error: cannot locate harness process in ancestry
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  READ-ONLY SESSION - FLEET LOCK OWNERSHIP WAS NOT VERIFIED
+●  error: cannot locate harness process in ancestry
+●  Skipping every mutating step: stale Herdr child cleanup,
+●  secondmate convergence, secondmate liveness, pending remote handoff retry,
+●  X-mode artifacts, fleet sync, and wake-queue drain. Detect-only bootstrap
+●  diagnostics and the rest of this read-only-safe digest still ran below.
+●  Operate read-only until this resolves - do not spawn, steer, merge, or
+●  otherwise mutate fleet state from this session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BOOTSTRAP
+--------------------------------------------------------------------------------
+(silent - all good)
+
+WAKE QUEUE
+--------------------------------------------------------------------------------
+skipped (read-only session) - 0 record(s) remain queued because this session lacks verified fleet-lock ownership.
+================================================================================
+29:SUPERVISION OPERATING INSTRUCTIONS - primary harness: unknown
+37:Mode: Unknown harness fallback.
+screenshot: r2-dsh-web-digest-read-only-unknown-harness.png (composer shows 'Full access'; expanded hooks-claude-code injection shows the ancestry error)
+
+## 3. cause A: hook subprocesses do not run under the session's permission preset
+probe UserPromptSubmit hook (ps ancestry walk) in a danger-full-access session:
+  ps failed: /bin/ps: Operation not permitted            fm-harness.sh -> unknown
+same probe, host launched with DSH_PERMISSION_MODE=danger-full-access:
+  ps works; fm-harness.sh -> dsh; fm-harness.sh ancestry -> args dsh
+control, outside DSH in the same shell: node -> bash -c 'ps -p $$' works
+DSH source:
+  dsh-hooks-claude-code/lib/index.js:182:				const { output, durationMs } = await runHook(ctx.shell, hook, {
+  dsh-bash-sandbox/lib/index.js:141:			sandboxPolicy: request.sandboxPolicy ?? this.ctx.sandboxPolicy.resolve()
+  dsh-sandbox-policy/lib/index.js:144:			mode: request.mode ?? (session === void 0 ? void 0 : this.overrideOf(session)) ?? this.defaultMode,
+  composed sandbox-policy row (web and headless dumps, tracked patch applied): mode: !!js process.env.DSH_PERMISSION_MODE ?? 'workspace-write'
+  => the bridge calls the shell with no session, so hooks get the deployment default (workspace-write), whatever permission.defaultPreset says
+
+## 4. cause B: even with ps permitted, the digest's harness detection stops one process short of the DSH host
+host launched with DSH_PERMISSION_MODE=danger-full-access: LOCK 'lock acquired: harness pid <node dsh>' (fm-session-lock-lib walks 16), but
+  SUPERVISION OPERATING INSTRUCTIONS - primary harness: unknown / Mode: Unknown harness fallback
+ancestry recorded by fm-harness.sh inside the digest (instrumented disposable clone, then restored):
+55145 55143 bash <tmp>/fmhome/bin/fm-harness.sh
+55143 55132 bash <tmp>/fmhome/bin/fm-session-start.sh --source startup
+55132 55131 bash <tmp>/fmhome/bin/fm-session-start.sh --source startup
+55131 55115 perl -e my $t = shift; my $pid = fork; die "fork failed" unless defined $pid; if (!$pid) { setpgrp(0, 0); exec @ARGV } local $SIG{ALRM} = 
+55115 55114 bash <tmp>/fmhome/bin/fm-session-start.sh --source startup
+55114 55102 bash <tmp>/fmhome/bin/fm-dsh-sessionstart.sh
+55102 55094 bash <tmp>/fmhome/bin/fm-dsh-sessionstart.sh
+55094 54910 bash -lc payload=$(cat 2>/dev/null || true); [ -n "$payload" ] || exit 0; command -v jq >/dev/null 2>&1 || exit 0; root=${CLAUDE_PROJECT_D
+54910 54908 node /Users/stevemcqueen/.npm/_npx/1e7f6d9597241db0/node_modules/.bin/dsh --profile fmh --patch <tmp>/fmhome/.dsh/profile.patch.yml 
+54908 54902 bash <tmp>/run-headless.sh <tmp>/d7.out <tmp>/fmhome/bin/fm-dsh-launch.sh --profile fmh --patch /tmp
+  => node dsh is the 9th process; fm_dsh_ancestry (bin/fm-dsh-lib.sh) and harness_ancestry (bin/fm-harness.sh) examine only 8, so the
+     FM_DSH_HARNESS marker is refused and the digest delivers the unknown-harness fallback instead of docs/supervision-protocols/dsh.md

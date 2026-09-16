@@ -1,0 +1,93 @@
+# (g) headless profile (no agent presets) with the tracked patch: host row governs
+
+$ bin/fm-dsh-preflight.sh --profile headless --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in profile headless
+ok    new sessions default to the danger-full-access permission preset (profile headless)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+[exit 0]
+
+# (h) headless: an overlay disables the host agent-instructions row that still says maxBytes 262144
+
+$ bin/fm-dsh-preflight.sh --profile headless --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml --patch /tmp/fm-dsh-test.EZa9Vo/disable-host-row.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  profile headless's agent-instructions row is not enabled, so no maxBytes on it is a budget
+      enable the agent-instructions row in /tmp/fm-dsh-test.EZa9Vo/dsh-home/profiles/headless/cordis.patch.yml: a disabled row renders nothing, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile headless)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (i) web: the firstmate preset's agent-instructions row is disabled (home copy at /tmp/fm-dsh-test.EZa9Vo/homecopy)
+50-  name: '@deepseek-ai/dsh-agent-instructions'
+51-  config:
+52-    maxBytes: 262144
+53:  disabled: true
+54-
+--
+222-    # alone grants no tool.
+223-    - id: tool-subagent-codex
+224-      name: '@deepseek-ai/dsh-tool-subagent'
+225:      disabled: true
+
+$ bin/fm-dsh-preflight.sh --profile web --home /tmp/fm-dsh-test.EZa9Vo/home-disabled --patch /tmp/fm-dsh-test.EZa9Vo/home-disabled/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  the firstmate agent preset's agent-instructions row is not enabled, so no maxBytes on it is a budget
+      enable the agent-instructions row in /tmp/fm-dsh-test.EZa9Vo/home-disabled/.dsh/agent-presets/firstmate/agent.cordis.yml: a disabled row renders nothing, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (j) web: the firstmate preset has no agent-instructions row (a re-sync that dropped it)
+2
+
+$ bin/fm-dsh-preflight.sh --profile web --home /tmp/fm-dsh-test.EZa9Vo/home-norow --patch /tmp/fm-dsh-test.EZa9Vo/home-norow/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  the firstmate agent preset has no agent-instructions row
+      add one with a raised maxBytes in /tmp/fm-dsh-test.EZa9Vo/home-norow/.dsh/agent-presets/firstmate/agent.cordis.yml: without it no workspace instructions reach the agent
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (k) web: a re-sync of standard that forgot the raise (maxBytes back to 65536)
+
+$ bin/fm-dsh-preflight.sh --profile web --home /tmp/fm-dsh-test.EZa9Vo/home-65536 --patch /tmp/fm-dsh-test.EZa9Vo/home-65536/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  the rendered instruction chain is about 83242 bytes but the firstmate agent preset's maxBytes is 65536
+      raise the agent-instructions entry's maxBytes in /tmp/fm-dsh-test.EZa9Vo/home-65536/.dsh/agent-presets/firstmate/agent.cordis.yml, and on every DSH home: over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]
+
+# (l) web: a 200 KB harness-home $DSH_HOME/AGENTS.md pushes the rendered chain past the preset's 262144
+
+$ bin/fm-dsh-preflight.sh --profile web --home /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS --patch /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/profile.patch.yml
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  the rendered instruction chain is about 285241 bytes but the firstmate agent preset's maxBytes is 262144
+      raise the agent-instructions entry's maxBytes in /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2NF7AP3AHPMX0MZJJZAY8XS/.dsh/agent-presets/firstmate/agent.cordis.yml, and on every DSH home: over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+[exit 3]

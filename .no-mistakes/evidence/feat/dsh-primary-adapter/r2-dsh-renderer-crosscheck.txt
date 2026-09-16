@@ -1,0 +1,4 @@
+# Round 2 at ba844b4: DSH 0.1.5-rc.2 preset discovery and instruction renderer, this checkout as the workspace, fresh DSH_HOME
+discoverPresets firstmate: found, healthy, name="Firstmate"
+maxBytes 262144: omitted=[] truncated=[] renderedBytes=82554
+maxBytes 65536: omitted=["AGENTS.md"] truncated=[] renderedBytes=455
