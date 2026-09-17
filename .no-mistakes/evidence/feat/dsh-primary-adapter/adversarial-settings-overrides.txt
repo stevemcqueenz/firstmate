@@ -1,0 +1,34 @@
+=== A3 the harness settings document picks workspace-write as the new-session permission default (what DSH's General settings writes)
+$ printf 'permission:
+  defaultPreset: workspace-write
+' >> $DSH_HOME/settings.yaml; cd /tmp && bin/fm-dsh-launch.sh web --port 38081 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+FAIL  new sessions default to permission preset 'workspace-write' (<disposable DSH_HOME>/settings.yaml), not danger-full-access
+      clear any permission defaultPreset in <disposable DSH_HOME>/settings.yaml, which outranks the composition, and keep the permission entry's defaultPreset at danger-full-access as /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2P348TMMJ3XZSW25SMNZF47/.dsh/profile.patch.yml sets it, dropping any later --patch overlay that overrides that row: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3
+(no DSH host listening on 38081: the launcher refused before exec)
+
+=== A4 the harness settings document seats new sessions on DSH's standard agent preset
+$ printf 'agent-presets:
+  default: standard
+' >> $DSH_HOME/settings.yaml; cd /tmp && bin/fm-dsh-launch.sh web --port 38081 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (<disposable DSH_HOME>/settings.yaml), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in <disposable DSH_HOME>/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3
+(no DSH host listening on 38081: the launcher refused before exec)
+

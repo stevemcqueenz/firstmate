@@ -1,0 +1,45 @@
+## Real operator home (~/.dsh), real 'web' profile whose cordis.patch.yml is [] - the state the old documented 'dsh web' launch booted into
+$ env -u DSH_PERMISSION_MODE bin/fm-dsh-preflight.sh --profile web     # no tracked patch
+FAIL  the hooks bridge is not installed in profile 'web'
+      install it at the running dsh-base version: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (profile web), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in /Users/stevemcqueen/.dsh/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset '<inferred from the sandbox knobs>' (profile web), not danger-full-access
+      clear any permission defaultPreset in /Users/stevemcqueen/.dsh/settings.yaml, which outranks the composition, and keep the permission entry's defaultPreset at danger-full-access as /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2P348TMMJ3XZSW25SMNZF47/.dsh/profile.patch.yml sets it, dropping any later --patch overlay that overrides that row: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+FAIL  hooks run under an unpinned sandbox mode (!!js process.env.DSH_PERMISSION_MODE ?? workspace-write), not a literal danger-full-access
+      pin the sandbox-policy entry's mode to danger-full-access alongside the permission entry's defaultPreset, as .dsh/profile.patch.yml does and bin/fm-dsh-launch.sh applies, and drop any later --patch overlay that overrides that row: the hooks bridge runs hooks with no session, so ps is denied in every hook and the digest reads READ-ONLY with an unknown harness
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 4 required check(s) failed, 0 warning(s)
+exit=3
+
+$ DSH_PERMISSION_MODE=danger-full-access bin/fm-dsh-preflight.sh --profile web     # ambient export must NOT rescue the hook sandbox mode
+FAIL  the hooks bridge is not installed in profile 'web'
+      install it at the running dsh-base version: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+FAIL  sessions compose from agent preset 'standard' (profile web), not the firstmate preset
+      make firstmate the agent-presets default as .dsh/profile.patch.yml does, and clear any agent-presets default in /Users/stevemcqueen/.dsh/settings.yaml: another preset carries its own budget, DSH's standard preset renders at 65536, and over budget, DSH omits AGENTS.md whole and only the model sees its one-line budget marker
+FAIL  new sessions default to permission preset '<inferred from the sandbox knobs>' (profile web), not danger-full-access
+      clear any permission defaultPreset in /Users/stevemcqueen/.dsh/settings.yaml, which outranks the composition, and keep the permission entry's defaultPreset at danger-full-access as /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2P348TMMJ3XZSW25SMNZF47/.dsh/profile.patch.yml sets it, dropping any later --patch overlay that overrides that row: any other sandbox denies ps, so harness ancestry, the PID-strict watcher lock and away-mode ownership degrade silently (sandbox-policy.mode alone is refused at load)
+FAIL  hooks run under an unpinned sandbox mode (!!js process.env.DSH_PERMISSION_MODE ?? workspace-write), not a literal danger-full-access
+      pin the sandbox-policy entry's mode to danger-full-access alongside the permission entry's defaultPreset, as .dsh/profile.patch.yml does and bin/fm-dsh-launch.sh applies, and drop any later --patch overlay that overrides that row: the hooks bridge runs hooks with no session, so ps is denied in every hook and the digest reads READ-ONLY with an unknown harness
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 4 required check(s) failed, 0 warning(s)
+exit=3
+
+$ env -u DSH_PERMISSION_MODE bin/fm-dsh-preflight.sh --profile web --patch .dsh/profile.patch.yml     # what bin/fm-dsh-launch.sh now passes
+FAIL  the hooks bridge is not installed in profile 'web'
+      install it at the running dsh-base version: dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: 1 required check(s) failed, 0 warning(s)
+exit=3

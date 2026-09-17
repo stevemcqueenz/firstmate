@@ -1,0 +1,7 @@
+$ DSH_HOME=<disposable> dsh plugin --profile web add @deepseek-ai/dsh-hooks-claude-code@0.1.5-rc.2
+dependencies:
++ @deepseek-ai/dsh-hooks-claude-code 0.1.5-rc.2
+
+Done in 93ms using pnpm v12.4.1
+dsh: warning: @deepseek-ai/dsh-hooks-claude-code declares no dsh.bundle — installed as a plain dependency, not a profile layer (a later update that gains one activates it automatically)
+exit=

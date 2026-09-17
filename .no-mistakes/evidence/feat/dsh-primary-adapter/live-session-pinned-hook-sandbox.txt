@@ -1,0 +1,44 @@
+## Pinned run: real DSH session through the launcher, DSH_PERMISSION_MODE unset, firstmate's tracked .dsh/hooks.json live
+$ cd /tmp && env -u DSH_PERMISSION_MODE <checkout copy>/bin/fm-dsh-launch.sh --profile fmdshtest "<prompt>"
+prompt: Do not use any tools. A firstmate session-start digest was delivered into your context by a hook. Reply with exactly three lines and nothing else: line 1 = the full text of the line in your context that begins with 'Follow the supervision operating instructions block above for harness', or NONE if absent; line 2 = YES if your context contains the text 'READ-ONLY SESSION', otherwise NO; line 3 = YES if your context contains the text 'FIRSTMATE', otherwise NO.
+--- launcher + session output:
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in profile fmdshtest
+ok    new sessions default to the danger-full-access permission preset (profile fmdshtest)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+dsh: reasoning:
+The user asks a question about my context, not to use any tools. I need to answer exactly three lines:
+
+Line 1: the full text of the line in my context that begins with 'Follow the supervision operating instructions block above for harness' — or NONE if absent. In the digest I see: "Follow the supervision operating instructions block above for harness 'dsh'." That's the line starting with that phrase. The line is "Follow the supervision operating instructions block above for harness 'dsh'."
+
+Line 2: YES if context contains 'READ-ONLY SESSION' otherwise NO. I don't see that text. NO.
+
+Line 3: YES if contains 'FIRSTMATE' otherwise NO. The context contains "FIRSTMATE_OP: v1 launch-brief" in AGENTS.md instructions... Actually the workspace instructions mention `FIRSTMATE_OP: v1 launch-brief`. That contains 'FIRSTMATE'. Also "FIRSTMATE" appears in... let me check. "FIRSTMATE_OP: v1 launch-brief" yes. So YES.
+
+Answer exactly three lines, nothing else.
+Follow the supervision operating instructions block above for harness 'dsh'.
+NO
+YES
+exit=0
+--- firstmate state the hooks left in the home:
+drwxr-xr-x@ 15 stevemcqueen  wheel   480 Sep 17 02:06 .
+drwx------@ 32 stevemcqueen  wheel  1024 Sep 17 02:06 ..
+-rw-r--r--@  1 stevemcqueen  wheel    45 Sep 17 02:06 .dsh-sessionstart-delivered
+-rw-------@  1 stevemcqueen  wheel    25 Sep 17 02:06 .inactive-outcome-reconcile
+-rw-r--r--@  1 stevemcqueen  wheel     6 Sep 17 02:06 .lock
+-rw-------@  1 stevemcqueen  wheel    78 Sep 17 02:06 .session-start-agents-baseline
+-rw-------@  1 stevemcqueen  wheel     6 Sep 17 02:06 .session-start-complete
+-rw-------@  1 stevemcqueen  wheel    10 Sep 17 02:06 .startup-network.delivered
+-rw-------@  1 stevemcqueen  wheel     0 Sep 17 02:06 .startup-network.report
+-rw-------@  1 stevemcqueen  wheel   162 Sep 17 02:06 .startup-network.status
+-rw-------@  1 stevemcqueen  wheel   201 Sep 17 02:06 .startup-network.timings
+-rw-------@  1 stevemcqueen  wheel    10 Sep 17 02:06 .trace-context-effective
+-rw-r--r--@  1 stevemcqueen  wheel     0 Sep 17 02:06 .wake-queue
+-rw-------@  1 stevemcqueen  wheel  1018 Sep 17 02:06 home-summary.json
+drwxr-xr-x@  2 stevemcqueen  wheel    64 Sep 17 02:06 terminal-outcomes
+sessionstart delivered marker: session-d30c4ca3-e9b1-44b8-893a-0b665f50add5

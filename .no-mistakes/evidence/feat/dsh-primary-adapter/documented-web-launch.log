@@ -1,0 +1,11 @@
+$ cd /tmp && DSH_HOME=<disposable home, bridge 0.1.5-rc.2 installed> env -u DSH_PERMISSION_MODE /Users/stevemcqueen/.no-mistakes/worktrees/d4473b8368ae/01M2P348TMMJ3XZSW25SMNZF47/bin/fm-dsh-launch.sh web --port 38080 --no-open
+ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+ok    instruction budget 262144 fits the rendered instruction chain (about 83242 bytes) in the firstmate agent preset
+ok    new sessions default to the danger-full-access permission preset (profile web)
+ok    hooks run under the danger-full-access sandbox mode
+ok    lsof present (teardown stale-lock proof and orphan reap)
+ok    jq present (hook transport and command policies)
+ok    node present (hook transport and command policies)
+
+dsh preflight: all required checks passed, 0 warning(s)
+dsh web: http://127.0.0.1:38080/?token=<redacted>

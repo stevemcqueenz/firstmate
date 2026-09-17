@@ -1,0 +1,26 @@
+## Counter-test: identical session, but an operator overlay hands sandbox-policy.mode back to dsh-base's env expression and the preflight is skipped; DSH_PERMISSION_MODE unset
+overlay: - id: sandbox-policy / config: / mode: !!js process.env.DSH_PERMISSION_MODE ?? 'workspace-write'
+$ cd /tmp && env -u DSH_PERMISSION_MODE FM_DSH_SKIP_PREFLIGHT=1 <checkout copy>/bin/fm-dsh-launch.sh --profile fmdshtest --patch <overlay> "<same prompt>"
+--- session output:
+dsh: reasoning:
+The user asks me to reply with exactly three lines. I must not use tools. Let me check the context.
+
+Line 1: the full text of the line in my context that begins with 'Follow the supervision operating instructions block above for harness' — I need to search my context for a line beginning with that text. Looking at the digest... The supervision block says "Follow the generic supervision contract in `AGENTS.md`." I don't see the exact text "Follow the supervision operating instructions block above for harness". So NONE.
+
+Line 2: Does my context contain 'READ-ONLY SESSION'? Yes — "READ-ONLY SESSION - FLEET LOCK OWNERSHIP WAS NOT VERIFIED". So YES.
+
+Line 3: Does my context contain 'FIRSTMATE'? Yes — "FM_OPERATIONAL_PREFIX ... FIRSTMATE_OP" and "FIRSTMATE_OP: v1 launch-brief". So YES.
+
+So reply:
+NONE
+YES
+YES
+
+Exactly three lines and nothing else.
+NONE
+YES
+YES
+exit=0
+--- firstmate state the hooks left in the home:
+. .. .dsh-sessionstart-delivered 
+sessionstart delivered marker: session-2c9d8a6f-c12b-4db2-8493-4a325b69b8a3

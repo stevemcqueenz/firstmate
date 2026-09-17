@@ -1,0 +1,22 @@
+$ bin/fm-spawn.sh t1 <throwaway home> --harness dsh --mode direct-PR --yolo off
+error: dsh is a verified PRIMARY adapter only and cannot run a crewmate, scout or secondmate; it has no endpoint, interrupt, exit or busy-state control plane. See docs/supervision-protocols/dsh.md.
+exit=1
+
+$ bin/fm-spawn.sh t2 <throwaway home> --scout --harness dsh
+error: dsh is a verified PRIMARY adapter only and cannot run a crewmate, scout or secondmate; it has no endpoint, interrupt, exit or busy-state control plane. See docs/supervision-protocols/dsh.md.
+exit=1
+
+$ bin/fm-spawn.sh t3 <throwaway home> --secondmate --harness dsh
+error: dsh is a verified PRIMARY adapter only and cannot run a crewmate, scout or secondmate; it has no endpoint, interrupt, exit or busy-state control plane. See docs/supervision-protocols/dsh.md.
+exit=1
+
+# config/crew-harness now contains: dsh
+$ bin/fm-spawn.sh t4 <throwaway home> --mode direct-PR --yolo off
+error: dsh is a verified PRIMARY adapter only and cannot run a crewmate, scout or secondmate; it has no endpoint, interrupt, exit or busy-state control plane. See docs/supervision-protocols/dsh.md.
+exit=1
+
+# near-miss harness name must NOT get the primary-adapter refusal
+$ bin/fm-spawn.sh t5 <throwaway home> --harness dshx --mode direct-PR --yolo off
+error: unknown harness 'dshx'; pass a raw launch command to use an unverified adapter
+exit=1
+

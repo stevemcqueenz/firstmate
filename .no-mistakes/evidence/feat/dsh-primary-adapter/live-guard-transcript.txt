@@ -1,0 +1,11 @@
+$ env -u DSH_PERMISSION_MODE FM_DSH_LIVE_E2E=1 bash tests/fm-dsh-live-e2e.test.sh   # 2026-09-16T23:58:32Z, head 9ac2c20
+info: dsh-base 0.1.5-rc.2 at /Users/stevemcqueen/.npm/_npx/1e7f6d9597241db0/node_modules/@deepseek-ai
+ok - live dsh 0.1.5-rc.2: a matching bridge pin passes the preflight
+ok - live dsh 0.1.5-rc.2: UserPromptSubmit context reached the first request
+ok - live dsh 0.1.5-rc.2: the bash-matcher PreToolUse deny blocked the command
+ok - live dsh 0.1.5-rc.2: the Stop hook forced one bounded continuation (2 firings)
+ok - live dsh 0.1.5-rc.2: a hook subprocess inherits the host's harness marker
+ok - live dsh 0.1.5-rc.2: the documented web launch renders AGENTS.md whole through the firstmate preset (budget 262144)
+ok - live dsh 0.1.5-rc.2: the launcher's web exec loads the plugin tree with the tracked patch applied once
+ok - live dsh 0.1.5-rc.2: the tracked patch keeps dsh-base's permission presets (read-only workspace-write danger-full-access)
+exit=0
