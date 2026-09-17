@@ -1,0 +1,9 @@
+== started 2026-09-17T10:05:17Z at f42d8c1
+holder pid 72536: node node -e setTimeout(function () {}, 600000)
+fm-lock status before session: lock: stale (pid 72536 dead or not a harness)
+session reply: PING
+lock before=72536 after=72832 holder still alive=yes
+RESULT: non-dsh-shaped live holder treated as stale; the session took the lock as its own (now-exited) host pid
+digest lines in /Users/stevemcqueen/.dsh/sessions/--private-var-folders-kf-pthqkgx93fv64yktz0lw_pt40000gn-T-fm-dsh-disc.GCbKM7-disc-work--/session-a2433a6e-d14a-4aaf-87a4-896e855e80ff/session.v3.jsonl.zstd:
+lock acquired: harness pid 72832
+== exit 0

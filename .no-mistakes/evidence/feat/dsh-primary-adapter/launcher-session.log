@@ -1,0 +1,23 @@
+== started 2026-09-17T10:06:24Z at f42d8c1, dsh 0.1.5-rc.1
+caller env: CLAUDECODE=1 FM_DSH_HARNESS=unset
+launcher exit 0; preflight + session output:
+  | ok    hooks bridge 0.1.5-rc.2 matches dsh-base 0.1.5-rc.2
+  | ok    instruction budget 262144 fits the rendered instruction chain (about 83723 bytes) in profile fmdshtestlaunch
+  | ok    new sessions default to the danger-full-access permission preset (profile fmdshtestlaunch)
+  | ok    hooks run under the danger-full-access sandbox mode
+  | ok    lsof present (teardown stale-lock proof and orphan reap)
+  | ok    jq present (hook transport and command policies)
+  | ok    node present (hook transport and command policies)
+  | 
+  | dsh preflight: all required checks passed, 0 warning(s)
+  | dsh: reasoning:
+  | The user asks: "Without using any tools, reply with ONLY the word PING." There's also a system reminder about workspace instructions. But the direct user instruction says reply with only PING, no tools. The AGENTS.md says address captain at least once per message. But the user explicitly says reply with ONLY the word PING. Direct user instruction takes precedence over workspace instructions. So just reply "PING".
+  | 
+  | Also there's the session start digest. But the user says no tools and only PING. Comply.
+  | PING
+lock after session: 89885 (alive now: no)
+once-per-session gate: session-5f14d892-e2e2-4042-ad91-fa8d0e32d0f0
+digest lines the session's request carried (/Users/stevemcqueen/.dsh/sessions/--Users-stevemcqueen-.no-mistakes-worktrees-d4473b8368ae-01M2Q4JBTYCAJSC5HZMJ6KS98J--/session-5f14d892-e2e2-4042-ad91-fa8d0e32d0f0/session.v3.jsonl.zstd):
+  harness: dsh
+  lock acquired: harness pid 89885
+== exit 0

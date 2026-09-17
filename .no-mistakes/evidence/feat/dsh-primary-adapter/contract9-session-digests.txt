@@ -1,0 +1,9 @@
+== DSH persisted sessions for this guard run's contract 9 workspace (guard run 2026-09-17T10:04:06Z-10:04:47Z):
+   /Users/stevemcqueen/.dsh/sessions/--private-var-folders-kf-pthqkgx93fv64yktz0lw_pt40000gn-T-fm-dsh-live.5e6pRm-lock-work--
+-- session-13a333c1-92ff-4939-b35e-b4ea49c4d2d5 (written 2026-09-17T12:04:42+0200)
+   harness: dsh
+   lock acquired: harness pid 60107
+-- session-a1baee52-fdf0-488d-9a97-e91f28a8e856 (written 2026-09-17T12:04:47+0200)
+   READ-ONLY SESSION - FLEET LOCK OWNERSHIP WAS NOT VERIFIED
+   another live firstmate session holds the lock (pid 59752); operate read-only until resolved
+   harness: dsh

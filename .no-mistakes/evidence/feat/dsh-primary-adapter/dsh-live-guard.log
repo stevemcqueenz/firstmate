@@ -1,0 +1,16 @@
+== canary before guard: firstmate: 1 windows (created Thu Sep 17 12:04:06 2026)
+== ancestry of guard caller: claude -> /Users/stevemcqueen/.no-mistakes/bin/no-mistakes
+== started 2026-09-17T10:04:06Z at f42d8c1, dsh 0.1.5-rc.1
+info: dsh-base 0.1.5-rc.2 at /Users/stevemcqueen/.npm/_npx/1e7f6d9597241db0/node_modules/@deepseek-ai
+ok - live dsh 0.1.5-rc.2: a matching bridge pin passes the preflight
+ok - live dsh 0.1.5-rc.2: UserPromptSubmit context reached the first request
+ok - live dsh 0.1.5-rc.2: the bash-matcher PreToolUse deny blocked the command
+ok - live dsh 0.1.5-rc.2: the Stop hook forced one bounded continuation (2 firings)
+ok - live dsh 0.1.5-rc.2: a hook subprocess inherits the host's harness marker
+ok - live dsh 0.1.5-rc.2: the documented web launch renders AGENTS.md whole through the firstmate preset (budget 262144)
+ok - live dsh 0.1.5-rc.2: the launcher's web exec loads the plugin tree with the tracked patch applied once
+ok - live dsh 0.1.5-rc.2: the tracked patch keeps dsh-base's permission presets (read-only workspace-write danger-full-access)
+ok - live dsh 0.1.5-rc.2: a session takes a free fleet lock as its own, and a separate host process refuses a held one into read-only
+== guard exit 0 at 2026-09-17T10:04:47Z
+== canary after guard: firstmate: 1 windows (created Thu Sep 17 12:04:06 2026)
+== leftover throwaway profiles: node_modules sdk web 
